@@ -4,6 +4,16 @@ struct PressReleaseLink {
     url: String,
 }
 
+fn keyword_check(url: &String) -> bool {
+    let keywords = ["Phase-1", "Phase-I", "Phase-2", "Phase-II", "Preliminary"];
+    for word in keywords {
+        if url.contains(&word) {
+            return true
+        };
+    };
+    false
+}
+
 //fn add_pressrelease_link(url: String)
 
 fn main() {
@@ -19,31 +29,19 @@ fn main() {
 
     for html_pressrelease in html_pressreleases {
         let url = html_pressrelease
-            .select(&scraper::Selector::parse(" a").unwrap())
+            .select(&scraper::Selector::parse("a").unwrap())
             .next()
             .and_then(|a| a.value().attr("href"))
-            //.and_then(|a| a.inner_html())
             .map(str::to_owned);
 
-        // let press_release_link = PressReleaseLink {
-        //     url
-        // };
-
-        // match url {
-        //     None => (),
-        //     Some(url) => {let press_release_link = PressReleaseLink {url};
-        //     press_releases.push(press_release_link);}
-        // }
+    
         if let Some(url) = url {
+            if !keyword_check(&url) {
+                continue;
+            }
             let press_release_link = PressReleaseLink {url};
             press_releases.push(press_release_link);
         }
-
-        // match &press_release_link.url {
-            
-        //     Some(i) => press_releases.push(press_release_link),
-        // }
-        
     }
 
     for (index, release) in press_releases.iter().enumerate() {
