@@ -1,4 +1,4 @@
-use reqwest::blocking;
+use reqwest::{blocking, Error};
 use scraper::{Html, Selector};
 
 pub struct PressReleaseLink {
@@ -17,9 +17,9 @@ fn keyword_check(url: &str) -> bool {
     false
 }
 
-pub fn scrape_press_website() {
-    let response = blocking::get("https://ir.vikingtherapeutics.com/press-releases",)
-    .unwrap().text().unwrap();
+pub fn scrape_press_website() -> Result<Vec<PressReleaseLink>, Error>{
+    let response = blocking::get("https://ir.vikingtherapeutics.com/press-releases",)?
+    .text()?;
 
     let document = Html::parse_document(&response);
 
@@ -48,4 +48,5 @@ pub fn scrape_press_website() {
         println!("Press Release #{}", index + 1);
         println!("Url: {:?}", release.url);
     }
+    Ok(press_releases)
 }

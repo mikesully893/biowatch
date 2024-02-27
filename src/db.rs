@@ -1,9 +1,10 @@
 use postgres::{Client, Error, NoTls};
 
+#[derive(Debug)]
 pub struct CompanyInfoRow {
-    name: String,
-    symbol: String,
-    url: String
+    pub name: String,
+    pub symbol: String,
+    pub url: String
 }
 
 pub fn query_db() -> Result<Vec<CompanyInfoRow>, Error> {
