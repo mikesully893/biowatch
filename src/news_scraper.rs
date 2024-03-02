@@ -3,8 +3,14 @@ use scraper::{Html, Selector};
 use chrono::{Utc, Datelike};
 
 pub struct PressReleaseLink {
-    url: String,
-    news_site: NewsSite
+    pub symbol: String,
+    pub url: String,
+    pub news_site: NewsSite
+}
+
+pub struct Notification {
+    pub symbol: String,
+    pub press_release_url: String
 }
 
 pub enum NewsSite {
@@ -39,20 +45,20 @@ fn get_date(url: &NewsSite) -> String {
     let year = current_date.year();
     let month = current_date.month();
     let day = current_date.day();
-    //let date = String::new();
+    
     match url {
         NewsSite::BusinessWire => format!("{}{}{}", year, month, day),
         NewsSite::GlobalNewsWire => format!("{}/{}/{}", year, month, day),
     }
 }
 
-pub fn scrape_news_website(url_struct: &PressReleaseLink) -> Result<Vec<String>, Error>{
+pub fn scrape_news_website(url_struct: &PressReleaseLink) -> Result<Vec<Notification>, Error>{
     let response = blocking::get(&url_struct.url)?
     .text()?;
 
     let document = Html::parse_document(&response);
 
-    let mut press_releases: Vec<String> = Vec::new();
+    let mut press_releases: Vec<Notification> = Vec::new();
 
     let html_pressrelease_selector = Selector::parse("div").unwrap();
     let html_pressreleases = document.select(&html_pressrelease_selector);
@@ -72,13 +78,14 @@ pub fn scrape_news_website(url_struct: &PressReleaseLink) -> Result<Vec<String>,
             if !keyword_check(&url) {
                 continue;
             }
-            //let press_release_link = PressReleaseLink {url};
-            press_releases.push(url);
+            press_releases.push(Notification { symbol: url_struct.symbol.clone(), press_release_url: url });
         }
     }
+    
     for (index, release) in press_releases.iter().enumerate() {
         println!("Press Release #{}", index + 1);
-        println!("Url: {:?}", release);
+        println!("Url: {:?}", &release.press_release_url);
+        println!("Symbol: {:?}", &release.symbol);
     }
     Ok(press_releases)
 }

@@ -20,7 +20,6 @@ pub fn query_db() -> Result<Vec<CompanyInfoRow>, Error> {
 
         let company_info_row = CompanyInfoRow {name, symbol, url};
         query_rows.push(company_info_row);
-        //println!("Company number:{} Symbol:{} Name:{}", &url, &symbol, &name);
     }
     Ok(query_rows)
 }
